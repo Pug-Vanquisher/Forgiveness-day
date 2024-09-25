@@ -6,9 +6,9 @@ PhysicMaterial:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: CharacterMat
-  dynamicFriction: 0.7
-  staticFriction: 0.7
+  m_Name: SlideMaterial
+  dynamicFriction: 0.07
+  staticFriction: 0.07
   bounciness: 0
   frictionCombine: 2
   bounceCombine: 0
