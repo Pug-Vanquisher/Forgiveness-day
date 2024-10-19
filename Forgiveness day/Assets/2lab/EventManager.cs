@@ -18,10 +18,10 @@ public class EventManager : MonoBehaviour
         }
     }
 
-    // Словарь для хранения событий
+    // Словарь событий
     private Dictionary<string, UnityEvent> eventDictionary = new Dictionary<string, UnityEvent>();
 
-    // Метод для подписки на события
+    // Метод для подписки
     public void Subscribe(string eventName, UnityAction listener)
     {
         if (!eventDictionary.ContainsKey(eventName))
@@ -31,7 +31,7 @@ public class EventManager : MonoBehaviour
         eventDictionary[eventName].AddListener(listener);
     }
 
-    // Метод для отписки от событий
+    // Метод для отписки
     public void Unsubscribe(string eventName, UnityAction listener)
     {
         if (eventDictionary.ContainsKey(eventName))

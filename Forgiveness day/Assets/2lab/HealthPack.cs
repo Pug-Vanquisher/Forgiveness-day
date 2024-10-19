@@ -6,9 +6,9 @@ public class HealthPack : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            // Увеличиваем здоровье игрока
+            // Активируем событие Heal
             EventManager.Instance.TriggerEvent("Heal");
-            Destroy(gameObject); // Удаляем аптечку после подбора
+            Destroy(gameObject);
         }
     }
 }

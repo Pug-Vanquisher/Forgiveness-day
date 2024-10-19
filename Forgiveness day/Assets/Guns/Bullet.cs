@@ -3,13 +3,13 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    public GameObject bulletHolePrefab;
-    public TrailRenderer trailRenderer;
     public float bulletLifetime = 2f;
     private bool hasCollided = false;
+    private AssetManager assetManager;
 
     private void Start()
     {
+        assetManager = FindObjectOfType<AssetManager>();
         StartCoroutine(DestroyAfterLifetime());
     }
 
@@ -20,12 +20,10 @@ public class Bullet : MonoBehaviour
 
         if (collision.collider.CompareTag("Enemy"))
         {
-            // Попадание во врага
             EnemyTakeDamage(collision.collider.gameObject);
         }
         else
         {
-            // Создаем след от пули, если объект не является врагом
             CreateBulletHole(collision);
         }
 
@@ -34,22 +32,21 @@ public class Bullet : MonoBehaviour
 
     private void EnemyTakeDamage(GameObject enemy)
     {
-        // Находим компонент врага и вызываем метод для нанесения урона
         DroneAI enemyAI = enemy.GetComponent<DroneAI>();
         if (enemyAI != null)
         {
-            enemyAI.TakeDamage(5f); // Наносим 10 единиц урона (или любое другое значение)
+            enemyAI.TakeDamage(5f);
         }
     }
 
     private void CreateBulletHole(Collision collision)
     {
         ContactPoint contact = collision.contacts[0];
-
         Vector3 hitPoint = contact.point + contact.normal * 0.01f;
         Quaternion rotation = Quaternion.FromToRotation(Vector3.up, contact.normal);
 
-        Instantiate(bulletHolePrefab, hitPoint, rotation);
+        // Вызов создания легковестного объекта эффекта попадания
+        assetManager.SpawnBulletHole(hitPoint, rotation);
     }
 
     private IEnumerator DestroyBulletAfterDelay(float delay)

@@ -7,21 +7,21 @@ public class EnemyBullet : MonoBehaviour
 
     private void Start()
     {
-        Destroy(gameObject, bulletLifetime); // Уничтожаем пулю через некоторое время, если не было столкновения
+        Destroy(gameObject, bulletLifetime); 
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Player")) // Проверяем, попали ли в игрока
+        if (collision.gameObject.CompareTag("Player"))
         {
             PlayerHealth playerHealth = collision.gameObject.GetComponent<PlayerHealth>();
 
             if (playerHealth != null)
             {
-                playerHealth.TakeDamage(damage); // Наносим урон игроку
+                playerHealth.TakeDamage(damage);
             }
 
-            Destroy(gameObject); // Уничтожаем пулю
+            Destroy(gameObject);
         }
     }
 }

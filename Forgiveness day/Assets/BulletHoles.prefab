@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6817850284516695773}
   - component: {fileID: 7822846638031716445}
   m_Layer: 0
-  m_Name: bullet hole
+  m_Name: BulletHoles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 5857211834143264157}
   m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
   m_LocalPosition: {x: -8.88, y: 2.141, z: 0.832}
-  m_LocalScale: {x: 0.012200216, y: 0.0005, z: 0.012777794}
+  m_LocalScale: {x: 0.012, y: 0.0005, z: 0.012}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}

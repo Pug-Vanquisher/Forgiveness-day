@@ -8,19 +8,21 @@ public class PlayerHealth : MonoBehaviour
 
     private void Start()
     {
+        // Подписка
         currentHealth = maxHealth;
         EventManager.Instance.Subscribe("Heal", Heal);
     }
 
     private void OnDestroy()
     {
+        // Отписка
         EventManager.Instance.Unsubscribe("Heal", Heal);
     }
 
     private void Heal()
     {
-        currentHealth = Mathf.Min(currentHealth + 20f, maxHealth); // Восстанавливаем 20 здоровья
-        Debug.Log("Player healed! Current health: " + currentHealth);
+        currentHealth = Mathf.Min(currentHealth + 20f, maxHealth);
+        Debug.Log("Текущее здоровье после хила: " + currentHealth);
     }
 
     public void TakeDamage(float damage)
@@ -35,7 +37,7 @@ public class PlayerHealth : MonoBehaviour
 
     private void Die()
     {
-        Debug.Log("Player is dead! Restarting level...");
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name); // Перезапуск сцены
+        Debug.Log("Помер");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

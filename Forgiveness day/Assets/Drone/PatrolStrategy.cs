@@ -16,7 +16,7 @@ public class PatrolStrategy : IDroneStrategy
             if (NavMesh.SamplePosition(randomDirection, out hit, 10f, 1))
             {
                 Vector3 targetPosition = hit.position;
-                targetPosition.y = 3f; // Устанавливаем высоту
+                targetPosition.y = 3f;
                 drone.Agent.SetDestination(targetPosition);
             }
         }

@@ -19,7 +19,6 @@ public class DroneAI : MonoBehaviour
 
     private void Start()
     {
-        // Находим игрока по тегу "Player"
         GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
         if (playerObject != null)
         {
@@ -27,7 +26,7 @@ public class DroneAI : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Player not found! Make sure the player has the tag 'Player'.");
+            Debug.LogError("Игрок не найден");
         }
 
         Health = MaxHealth;
@@ -45,7 +44,7 @@ public class DroneAI : MonoBehaviour
 
         currentStrategy.Execute(this); // Выполняем текущую стратегию
 
-        // Логика смены стратегий в зависимости от игрового состояния
+        // Логика смены стратегий
         if (Health <= MaxHealth * 0.15f) 
         {
             SetStrategy(new FleeStrategy());
@@ -83,7 +82,7 @@ public class DroneAI : MonoBehaviour
         Health -= damage; 
         Health = Mathf.Clamp(Health, 0, MaxHealth); 
 
-        Debug.Log($"Drone took {damage} damage! Current health: {Health}");
+        Debug.Log($"Нанесено {damage}, текущее хп: {Health}");
     }
 
     private void Die()
@@ -114,17 +113,19 @@ public class DroneAI : MonoBehaviour
         return Vector3.Distance(transform.position, Player.position) <= AttackRadius;
     }
 
+    // Ориентация на игрока
     public void LookAtPlayer()
     {
         Vector3 lookDirection = Player.position - transform.position;
-        lookDirection.y = 0; // Оставляем только поворот по оси Y
+        lookDirection.y = 0;
         transform.rotation = Quaternion.LookRotation(lookDirection);
     }
 
+    // Метод поддержания высоты от земли
     public void MaintainHeight()
     {
         Vector3 newPosition = transform.position;
-        newPosition.y = 3f; // Устанавливаем высоту в 3 метра
+        newPosition.y = 3f;
         transform.position = newPosition;
     }
 
@@ -135,12 +136,12 @@ public class DroneAI : MonoBehaviour
         Vector3 direction = (Player.position - firePoint.position).normalized;
         rb.velocity = direction * projectileSpeed;
 
-        Debug.Log("Drone is shooting a projectile at the player!");
+        Debug.Log("Выстрел");
     }
 
     public void StartHealing(float healRate)
     {
         Health += healRate * Time.deltaTime;
-        Health = Mathf.Clamp(Health, 0, MaxHealth); // Ограничиваем здоровье
+        Health = Mathf.Clamp(Health, 0, MaxHealth);
     }
 }

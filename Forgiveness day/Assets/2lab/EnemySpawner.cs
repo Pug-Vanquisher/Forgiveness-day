@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public GameObject enemyPrefab; // Префаб дрона
-    public Transform[] spawnPoints; // Места спавна
+    public GameObject enemyPrefab; 
+    public Transform[] spawnPoints; 
 
     private void Start()
     {
@@ -31,9 +31,8 @@ public class EnemySpawner : MonoBehaviour
 
     private void SpawnEnemy()
     {
-        // Выбираем случайную позицию спавна
         Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
         Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation);
-        Debug.Log("Spawned a new enemy!");
+        Debug.Log("Создан дрон");
     }
 }
