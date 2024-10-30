@@ -1,86 +1,37 @@
-using System.Collections;
 using UnityEngine;
 using DG.Tweening;
 
-public class Pistol : MonoBehaviour
+public class Pistol : Weapon
 {
-    [Header("Ammo Settings")]
-    public int maxAmmoInMagazine = 10;
-    public int currentAmmoInMagazine;
-    public int maxAmmoTotal = 50;
-    public int currentAmmoTotal;
-    public float reloadTime = 2f;
-
-    [Header("Shot Settings")]
-    public float fireRate = 0.5f;
-    public float bulletSpread = 0.05f;
-    public float shootForce = 1000f;
-    public float effectiveRange = 35f; 
-
-    [Header("Weapon Recoil Settings")]
-    public float weaponRecoilX = 0.1f;
-    public float weaponRecoilY = -0.07f;
-    public float weaponRecoilZ = -0.09f;
-    public float weaponRecoilDuration = 0.2f;
-
-    [Header("Camera Recoil Settings")]
-    public float cameraRecoilPunchX = 0.05f;
-    public float cameraRecoilPunchY = 0.05f;
-    public float cameraRecoilPunchZ = 0.05f;
-    public float cameraRecoilDuration = 0.1f;
-
-    [Header("References")]
-    public GameObject bulletPrefab;
-    public Transform firePoint;
-    public Camera gunCamera;
-    public Camera playerCamera;
-    public Camera hitCamera;
-    public AudioClip shootSound;
-    public AudioClip reloadSound;
-    public AudioSource audioSource;
-
-    private bool isReloading = false;
+    [Header("Pistol Settings")]
+    public float fireRate;
     private float nextTimeToFire = 0f;
-    private Vector3 initialWeaponPosition; 
 
-    private void Start()
-    {
-        currentAmmoInMagazine = maxAmmoInMagazine;
-        currentAmmoTotal = maxAmmoTotal;
-        initialWeaponPosition = transform.localPosition; 
-    }
+    private int superAbilityShotsRemaining = 8;
 
-    private void Update()
+    protected override void Shoot()
     {
-        if (Input.GetMouseButtonDown(0) && Time.time >= nextTimeToFire && !isReloading)
+        if (isSuperAbilityActive)
         {
-            Shoot();
+            PerformRaycastShot();
+            return;
         }
 
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            Reload();
-        }
-    }
-
-    private void Shoot()
-    {
         if (currentAmmoInMagazine <= 0)
         {
-            Debug.Log("пустой");
             Reload();
             return;
         }
 
+        if (Time.time < nextTimeToFire) return;
         nextTimeToFire = Time.time + fireRate;
 
         Vector3 targetPoint = GetTargetPoint();
-        Vector3 dirWithoutSpread = targetPoint - firePoint.position;
-        Vector3 dirWithSpread = AddBulletSpread(dirWithoutSpread, Vector3.Distance(firePoint.position, targetPoint));
+        Vector3 direction = AddBulletSpread(targetPoint - firePoint.position, Vector3.Distance(firePoint.position, targetPoint));
 
-        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
-        bullet.transform.forward = dirWithSpread.normalized;
-        bullet.GetComponent<Rigidbody>().AddForce(dirWithSpread.normalized * shootForce, ForceMode.Impulse);
+        GameObject bullet = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
+        bullet.transform.forward = direction.normalized;
+        bullet.GetComponent<Rigidbody>().AddForce(direction.normalized * shootForce, ForceMode.Impulse);
 
         currentAmmoInMagazine--;
 
@@ -93,74 +44,88 @@ public class Pistol : MonoBehaviour
         ApplyCameraRecoil();
     }
 
-    private Vector3 GetTargetPoint()
+    private void PerformRaycastShot()
     {
-        Ray ray = hitCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2));
-        RaycastHit hit;
+        if (superAbilityShotsRemaining <= 0) return;
 
-        if (Physics.Raycast(ray, out hit))
+        Ray ray = gunCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2));
+        if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            return hit.point;
-        }
-        else
-        {
-            return ray.GetPoint(100f);
+            if (hit.collider.CompareTag("Enemy"))
+            {
+                Transform enemyRoot = hit.collider.transform.root;
+                Transform head = FindHead(enemyRoot);
+
+                Vector3 hitPoint = head != null ? head.position : hit.point;
+
+                GameObject bullet = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
+                bullet.transform.forward = (hitPoint - firePoint.position).normalized;
+                bullet.GetComponent<Rigidbody>().AddForce((hitPoint - firePoint.position).normalized * shootForce, ForceMode.Impulse);
+
+                superAbilityShotsRemaining--;
+
+                if (audioSource && shootSound)
+                {
+                    audioSource.PlayOneShot(shootSound);
+                }
+
+                ApplyWeaponRecoil();
+                ApplyCameraRecoil();
+
+                if (superAbilityShotsRemaining <= 0)
+                {
+                    DeactivateSuperAbility();
+                }
+            }
         }
     }
 
-    private Vector3 AddBulletSpread(Vector3 direction, float distanceToTarget)
+    private Transform FindHead(Transform enemyRoot)
     {
-        float adjustedSpread = bulletSpread * Mathf.Lerp(0.1f, 1f, distanceToTarget / effectiveRange);
-        Vector2 randomCircle = Random.insideUnitCircle * adjustedSpread;
-        Vector3 right = Vector3.Cross(direction, Vector3.up).normalized;
-        Vector3 up = Vector3.Cross(right, direction).normalized;
-        Vector3 spread = right * randomCircle.x + up * randomCircle.y;
-        return direction + spread;
+        foreach (Transform child in enemyRoot.GetComponentsInChildren<Transform>())
+        {
+            EnemyCollider enemyCollider = child.GetComponent<EnemyCollider>();
+            if (enemyCollider != null && enemyCollider.isHeadCollider)
+            {
+                return child;
+            }
+        }
+        return null; // Голова не найдена
     }
 
-    private void ApplyWeaponRecoil()
+    protected override void ApplySuperAbilityEffects()
+    {
+        base.ApplySuperAbilityEffects();
+
+        // Заполняем магазин до 8 патронов
+        currentAmmoInMagazine = Mathf.Min(8, maxAmmoInMagazine);
+
+        // Включаем замедление времени
+        Time.timeScale = 0.001f;
+        Time.fixedDeltaTime = 0.02f * Time.timeScale;
+        fireRate = 0f;
+
+        // Устанавливаем оставшиеся выстрелы для суперспособности
+        superAbilityShotsRemaining = 8;
+    }
+
+    protected override void RemoveSuperAbilityEffects()
+    {
+        base.RemoveSuperAbilityEffects();
+
+        // Возвращаем время в нормальное состояние
+        Time.timeScale = 1f;
+        Time.fixedDeltaTime = 0.02f;
+        fireRate = 0.3f;
+    }
+
+    protected override void ApplyWeaponRecoil()
     {
         Vector3 recoilOffset = new Vector3(weaponRecoilX, weaponRecoilY, weaponRecoilZ);
         transform.DOLocalMove(initialWeaponPosition + recoilOffset, weaponRecoilDuration)
+            .SetUpdate(UpdateType.Normal, true) // Применение эффекта без учета Time.timeScale
             .OnComplete(() => {
                 transform.DOLocalMove(initialWeaponPosition, 0.2f).SetEase(Ease.OutBack);
             });
-    }
-
-    private void ApplyCameraRecoil()
-    {
-        Vector3 punch = new Vector3(cameraRecoilPunchX, cameraRecoilPunchY, cameraRecoilPunchZ);
-        playerCamera.transform.DOPunchPosition(punch, cameraRecoilDuration, 10, 0.1f);
-    }
-
-    private void Reload()
-    {
-        if (isReloading || currentAmmoTotal <= 0 || currentAmmoInMagazine == maxAmmoInMagazine)
-        {
-            return;
-        }
-
-        StartCoroutine(ReloadCoroutine());
-    }
-
-    private IEnumerator ReloadCoroutine()
-    {
-        isReloading = true;
-
-        if (audioSource && reloadSound)
-        {
-            audioSource.PlayOneShot(reloadSound);
-        }
-
-        yield return new WaitForSeconds(reloadTime);
-
-        int ammoNeeded = maxAmmoInMagazine - currentAmmoInMagazine;
-        int ammoToReload = Mathf.Min(ammoNeeded, currentAmmoTotal);
-
-        currentAmmoInMagazine += ammoToReload;
-        currentAmmoTotal -= ammoToReload;
-
-        isReloading = false;
-        Debug.Log("Перезаряжен");
     }
 }

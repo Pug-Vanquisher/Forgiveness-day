@@ -57,6 +57,9 @@ public class Dashing : MonoBehaviour
 
         pm.dashing = true;
         DashSound.Play();
+
+        EventManager.Instance.TriggerEvent("DashPerformed");
+
         pm.maxYSpeed = maxDashYSpeed;
 
         cam.DoFov(dashFov);
@@ -64,9 +67,9 @@ public class Dashing : MonoBehaviour
         Transform forwardT;
 
         if (useCameraForward)
-            forwardT = playerCam; /// where you're looking
+            forwardT = playerCam; 
         else
-            forwardT = orientation; /// where you're facing (no up or down)
+            forwardT = orientation;
 
         Vector3 direction = GetDirection(forwardT);
 
