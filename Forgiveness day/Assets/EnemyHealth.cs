@@ -6,12 +6,14 @@ public class EnemyHealth : MonoBehaviour
     public int maxHealth = 100;
     public int currentHealth;
     public bool alreadyDied;
+    public GameObject flame;
     private bool isBurning;
     private float burnDuration = 5f;
     private float burnDamageInterval = 1f;
 
     private void Start()
     {
+        flame.SetActive(false);
         currentHealth = maxHealth;
         alreadyDied = false;
     }
@@ -44,6 +46,7 @@ public class EnemyHealth : MonoBehaviour
 
     private IEnumerator BurnEffect()
     {
+        flame.SetActive(true);
         isBurning = true;
         float burnTime = burnDuration;
 
@@ -55,5 +58,6 @@ public class EnemyHealth : MonoBehaviour
         }
 
         isBurning = false;
+        flame.SetActive(false);
     }
 }

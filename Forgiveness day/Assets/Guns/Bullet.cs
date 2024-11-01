@@ -6,15 +6,15 @@ public class Bullet : MonoBehaviour
     public GameObject bulletHolePrefab;
     public TrailRenderer trailRenderer;
     public float bulletLifetime = 2f;
-    private bool hasCollided = false;
+    protected bool hasCollided = false;
     public int baseDamage = 20;
 
-    private void Start()
+    protected void Start()
     {
         StartCoroutine(DestroyAfterLifetime());
     }
 
-    private void OnCollisionEnter(Collision collision)
+    protected void OnCollisionEnter(Collision collision)
     {
         if (hasCollided) return;
         hasCollided = true;
@@ -31,7 +31,7 @@ public class Bullet : MonoBehaviour
         StartCoroutine(DestroyBulletAfterDelay(0.01f));
     }
 
-    private void HandleDamage(Collider collider)
+    protected virtual void HandleDamage(Collider collider)
     {
         EnemyHealth enemyHealth = collider.GetComponentInParent<EnemyHealth>();
         if (enemyHealth != null)
@@ -48,7 +48,7 @@ public class Bullet : MonoBehaviour
         }
     }
 
-    private void CreateBulletHole(Collision collision)
+    protected void CreateBulletHole(Collision collision)
     {
         ContactPoint contact = collision.contacts[0];
         Vector3 hitPoint = contact.point + contact.normal * 0.01f;
@@ -57,13 +57,13 @@ public class Bullet : MonoBehaviour
         Instantiate(bulletHolePrefab, hitPoint, rotation);
     }
 
-    private IEnumerator DestroyBulletAfterDelay(float delay)
+    protected IEnumerator DestroyBulletAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
         Destroy(gameObject);
     }
 
-    private IEnumerator DestroyAfterLifetime()
+    protected IEnumerator DestroyAfterLifetime()
     {
         yield return new WaitForSeconds(bulletLifetime);
 

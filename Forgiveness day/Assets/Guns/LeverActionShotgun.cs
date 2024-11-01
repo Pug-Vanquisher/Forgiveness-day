@@ -31,7 +31,7 @@ public class LeverActionShotgun : Weapon
 
     private void StartCenserSwinging()
     {
-        if (isSuperAbilityActive) return; // ќстановка качани€, если активна суперспособность
+        if (isSuperAbilityActive) return; 
 
         float swingDuration = 1f;
         float swingDistance = 0.2f;
