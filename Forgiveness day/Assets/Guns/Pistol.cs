@@ -97,7 +97,6 @@ public class Pistol : Weapon
     {
         base.ApplySuperAbilityEffects();
 
-        // Заполняем магазин до 8 патронов
         currentAmmoInMagazine = Mathf.Min(8, maxAmmoInMagazine);
 
         // Включаем замедление времени
@@ -105,7 +104,6 @@ public class Pistol : Weapon
         Time.fixedDeltaTime = 0.02f * Time.timeScale;
         fireRate = 0f;
 
-        // Устанавливаем оставшиеся выстрелы для суперспособности
         superAbilityShotsRemaining = 8;
     }
 
@@ -113,7 +111,6 @@ public class Pistol : Weapon
     {
         base.RemoveSuperAbilityEffects();
 
-        // Возвращаем время в нормальное состояние
         Time.timeScale = 1f;
         Time.fixedDeltaTime = 0.02f;
         fireRate = 0.3f;
@@ -123,7 +120,7 @@ public class Pistol : Weapon
     {
         Vector3 recoilOffset = new Vector3(weaponRecoilX, weaponRecoilY, weaponRecoilZ);
         transform.DOLocalMove(initialWeaponPosition + recoilOffset, weaponRecoilDuration)
-            .SetUpdate(UpdateType.Normal, true) // Применение эффекта без учета Time.timeScale
+            .SetUpdate(UpdateType.Normal, true)
             .OnComplete(() => {
                 transform.DOLocalMove(initialWeaponPosition, 0.2f).SetEase(Ease.OutBack);
             });

@@ -72,7 +72,6 @@ public abstract class Weapon : MonoBehaviour
             TryActivateSuperAbility();
         }
 
-        // ѕроверка на завершение суперспособности, игнорирующа€ Time.timeScale
         if (isSuperAbilityActive && Time.realtimeSinceStartup >= superAbilityEndTime)
         {
             DeactivateSuperAbility();
@@ -165,7 +164,6 @@ public abstract class Weapon : MonoBehaviour
         ApplySuperAbilityEffects();
         ScoreManager.Instance.StartSuperAbilityCooldown(OnSuperAbilityCooldownComplete);
 
-        // ”станавливаем конец суперспособности с использованием реального времени
         superAbilityEndTime = Time.realtimeSinceStartup + superAbilityDuration;
     }
 

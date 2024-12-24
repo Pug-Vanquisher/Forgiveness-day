@@ -31,7 +31,7 @@ public class EnemyHealth : MonoBehaviour
 
     private void Die()
     {
-        EventManager.Instance.TriggerEvent("EnemyKilled"); // Событие смерти
+        EventManager.Instance.TriggerEvent("EnemyKilled");
         Destroy(gameObject);
     }
 
@@ -52,7 +52,7 @@ public class EnemyHealth : MonoBehaviour
 
         while (burnTime > 0)
         {
-            TakeDamage(5); // Урон от горения
+            TakeDamage(5);
             yield return new WaitForSeconds(burnDamageInterval);
             burnTime -= burnDamageInterval;
         }
